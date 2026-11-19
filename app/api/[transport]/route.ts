@@ -18,8 +18,12 @@ const mcpHandler = createMcpHandler(
 
 async function handler(req: Request) {
   const url = new URL(req.url);
+  const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
   const apiKey =
-    url.searchParams.get("opendart_key") ?? req.headers.get("x-opendart-key");
+    url.searchParams.get("opendart_key") ??
+    req.headers.get("x-api-key") ??
+    req.headers.get("x-opendart-key") ??
+    (bearer || null);
   return runWithRequestApiKey(apiKey, () => mcpHandler(req));
 }
 
